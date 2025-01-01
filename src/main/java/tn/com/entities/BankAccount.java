@@ -6,6 +6,8 @@ import java.util.List;
 import enums.AccountStatus;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
@@ -18,6 +20,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name="bank_account")
+
 //on va utilisé une seule table
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name="TYPE", length=4)
@@ -27,9 +30,10 @@ import lombok.NoArgsConstructor;
 public class BankAccount {
 	@Id
 	// @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private String id;
+	private Long id;
 	private double balance;
 	private Date created_date;
+	@Enumerated(EnumType.STRING)
 	private AccountStatus status;
 	@ManyToOne
 	// plusieur comptes bancaires concerne un client
