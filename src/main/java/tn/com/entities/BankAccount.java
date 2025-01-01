@@ -8,6 +8,7 @@ import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
@@ -23,10 +24,13 @@ import lombok.NoArgsConstructor;
 
 //on va utilisé une seule table
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+//@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+//@Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name="TYPE", length=4)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+//la classe doit etre abstract
 public class BankAccount {
 	@Id
 	// @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +42,7 @@ public class BankAccount {
 	@ManyToOne
 	// plusieur comptes bancaires concerne un client
 	private Customer customer;
-	@OneToMany(mappedBy = "bankAccount")
+	@OneToMany(mappedBy = "bankAccount", fetch=FetchType.EAGER)
 	private List<AccountOperation> banckAccountoperations;
 
 }

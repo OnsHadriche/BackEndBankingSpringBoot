@@ -13,8 +13,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import enums.AccountStatus;
 import enums.OperationType;
 import tn.com.entities.AccountOperation;
+import tn.com.entities.BankAccount;
 import tn.com.entities.CurrentAccount;
 import tn.com.entities.Customer;
+import tn.com.entities.SavingAccount;
 import tn.com.repositories.AccountOperationRepository;
 import tn.com.repositories.BankAccountRepository;
 import tn.com.repositories.CustomerRepository;
@@ -27,8 +29,31 @@ public class EbankingBackendApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(EbankingBackendApplication.class, args);
 	}
-
 	@Bean
+	CommandLineRunner start(BankAccountRepository bankAccountRepo,
+			AccountOperationRepository accountOpRepo) {
+		return args -> {
+			BankAccount bankAccount = bankAccountRepo.findById((long) 3).orElse(null);
+			System.out.println("**************************");
+			System.out.println(bankAccount.getId());
+			System.out.println(bankAccount.getBalance());
+			System.out.println(bankAccount.getCustomer().getName());
+			System.out.println(bankAccount.getCreated_date());
+			if(bankAccount instanceof CurrentAccount) {
+				System.out.println(((CurrentAccount) bankAccount).getOverDraft());
+			}else {
+				System.out.println(((SavingAccount) bankAccount).getInteresRate());
+			}
+			bankAccount.getBanckAccountoperations().forEach(op->{
+				System.out.println("operation type: "+op.getType());
+				
+			});
+			
+			
+		};
+	}
+
+	//@Bean
 	CommandLineRunner start(CustomerRepository customRep, BankAccountRepository bankAccountRepo,
 			AccountOperationRepository accountOpRepo) {
 		return args -> {
@@ -59,7 +84,21 @@ public class EbankingBackendApplication {
 					accountOpRepo.save(accountOp);
 
 				}
+				
 			});
+			BankAccount bankAccount = bankAccountRepo.findById((long) 3).orElse(null);
+			System.out.println("**************************");
+			System.out.println(bankAccount.getId());
+			System.out.println(bankAccount.getBalance());
+			System.out.println(bankAccount.getCustomer().getName());
+			System.out.println(bankAccount.getCreated_date());
+			if(bankAccount instanceof CurrentAccount) {
+				System.out.println(((CurrentAccount) bankAccount).getOverDraft());
+			}else {
+				System.out.println(((SavingAccount) bankAccount).getInteresRate());
+			}
+			
+			
 		};
 	}
 }
