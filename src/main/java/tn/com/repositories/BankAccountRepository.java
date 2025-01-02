@@ -5,6 +5,6 @@ import org.springframework.stereotype.Repository;
 
 import tn.com.entities.BankAccount;
 @Repository
-public interface BankAccountRepository extends JpaRepository<BankAccount, Long> {
+public interface BankAccountRepository extends JpaRepository<BankAccount, String> {
 
 }

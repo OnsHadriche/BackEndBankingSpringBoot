@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import java.util.Date;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.springframework.boot.CommandLineRunner;
@@ -51,7 +52,7 @@ public class EbankingBackendApplication {
 			});
 			customRep.findAll().forEach(customer -> {
 				CurrentAccount currentAccount = new CurrentAccount();
-				currentAccount.setId((long) (Math.random() * 100));
+				currentAccount.setId(UUID.randomUUID().toString());
 				currentAccount.setBalance(Math.random() * 9000);
 				currentAccount.setCreated_date(new Date());
 				currentAccount.setStatus(AccountStatus.CREATED);
@@ -72,7 +73,7 @@ public class EbankingBackendApplication {
 				}
 				
 			});
-			BankAccount bankAccount = bankAccountRepo.findById((long) 3).orElse(null);
+			BankAccount bankAccount = bankAccountRepo.findById("jj").orElse(null);
 			System.out.println("**************************");
 			System.out.println(bankAccount.getId());
 			System.out.println(bankAccount.getBalance());

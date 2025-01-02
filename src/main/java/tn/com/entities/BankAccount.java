@@ -34,7 +34,7 @@ import lombok.NoArgsConstructor;
 public class BankAccount {
 	@Id
 	// @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private String id;
 	private double balance;
 	private Date created_date;
 	@Enumerated(EnumType.STRING)
