@@ -65,6 +65,7 @@ public class BankAccountServiceImp implements BankAccountService {
 		accountOp.setAmount(amount);
 		accountOp.setDescription(description);
 		accountOp.setOperationDate(new Date());
+		accountOp.setBankAccount(account);
 		accountOpRepo.save(accountOp);
 		// update account
 		account.setBalance(account.getBalance() - amount);
@@ -82,6 +83,7 @@ public class BankAccountServiceImp implements BankAccountService {
 		accountOp.setAmount(amount);
 		accountOp.setDescription(description);
 		accountOp.setOperationDate(new Date());
+		accountOp.setBankAccount(account);
 		accountOpRepo.save(accountOp);
 		// update account
 		account.setBalance(account.getBalance() + amount);
