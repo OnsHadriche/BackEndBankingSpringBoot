@@ -17,7 +17,7 @@ import tn.com.exception.BankAccountNotFoundException;
 import tn.com.exception.CustomerNotFoundException;
 import tn.com.services.BankAccountService;
 
-@SpringBootApplication(scanBasePackages = { "tn.com.services", "tn.com.repositories", "tn.com.entities" })
+@SpringBootApplication(scanBasePackages = { "tn.com.services", "tn.com.repositories", "tn.com.entities","tn.com.controllers" })
 @EnableJpaRepositories(basePackages = { "tn.com.repositories", "tn.com.services" })
 @EntityScan("tn.com.entities")
 public class EbankingBackendApplication {
@@ -38,14 +38,14 @@ public class EbankingBackendApplication {
 			});
 			bankAccountService.listCustomer().forEach(customer -> {
 				try {
-					bankAccountService.saveCurrentBankAccount(Math.random() * 10000, 9000, customer.getId());
-					bankAccountService.saveSavingBankAccount(Math.random() * 100, 2.2, customer.getId());
+					bankAccountService.saveCurrentBankAccount(Math.random() * 100000000, 9000, customer.getId());
+					bankAccountService.saveSavingBankAccount(Math.random() * 1000, 2.2, customer.getId());
 					List<BankAccount> bankAccounts = bankAccountService.listBankAccount();
 					for (BankAccount bankAccount : bankAccounts) {
 						for (int i = 0; i < 10; i++) {
 
 							bankAccountService.credit(bankAccount.getId(), 10000+Math.random() * 100000, "Credit");
-							bankAccountService.debit(bankAccount.getId(),100000+ Math.random() * 10, "Debit");
+							bankAccountService.debit(bankAccount.getId(),10+ Math.random() * 10, "Debit");
 
 						}
 					}

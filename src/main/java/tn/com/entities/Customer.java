@@ -2,6 +2,8 @@ package tn.com.entities;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -24,6 +26,7 @@ public class Customer {
 	private String name;
 	private String email;
 	@OneToMany(mappedBy="customer",fetch=FetchType.EAGER)
+	@JsonProperty(access=JsonProperty.Access.WRITE_ONLY)
 	private List<BankAccount> bankAccounts;
 	
 	
