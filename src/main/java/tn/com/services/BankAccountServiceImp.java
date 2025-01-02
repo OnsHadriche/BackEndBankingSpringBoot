@@ -6,88 +6,109 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import enums.OperationType;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import tn.com.entities.AccountOperation;
 import tn.com.entities.BankAccount;
 import tn.com.entities.CurrentAccount;
 import tn.com.entities.Customer;
 import tn.com.entities.SavingAccount;
+import tn.com.exception.BalanceNotSufficentException;
+import tn.com.exception.BankAccountNotFoundException;
 import tn.com.exception.CustomerNotFoundException;
-import tn.com.exception.RunTimeException;
 import tn.com.repositories.AccountOperationRepository;
 import tn.com.repositories.BankAccountRepository;
 import tn.com.repositories.CustomerRepository;
+
 @Service
 @Transactional
 @AllArgsConstructor
 @Slf4j
 public class BankAccountServiceImp implements BankAccountService {
-	
-	private CustomerRepository customerRepo;
-	private BankAccountRepository bankRepo;
-	private AccountOperationRepository accountOpRepo;
-	//la journalisation  
-	//Logger log =LoggerFactory.getLogger((this.getClass().getName()));
 
+    private final CustomerRepository customerRepo;
+    private final BankAccountRepository bankRepo;
+    private final AccountOperationRepository accountOpRepo;
 
-	@Override
-	public Customer saveCustomer(Customer customer) {
-		log.info("Saving new customer");
-		Customer savedCustomer=customerRepo.save(customer);
-		return savedCustomer;
-	}
+    @Override
+    public Customer saveCustomer(Customer customer) {
+        log.info("Saving new customer");
+        return customerRepo.save(customer);
+    }
 
-	@Override
-	public BankAccount saveBankAccount(double initialBalane, String type, Long customerId) throws CustomerNotFoundException  {
-		//generer une exception 
-		Customer customer = customerRepo.findById(customerId).orElseThrow(null);
-		if(customer == null) {
-			throw new CustomerNotFoundException("customer not found");
-		}
-		
-		BankAccount bankAccount;
-		if(type.equals("current")) {
-			bankAccount= new CurrentAccount();
-		}else {
-			bankAccount=new SavingAccount();
-		}
-		bankAccount.setId(UUID.randomUUID().toString());
-		bankAccount.setCreated_date(new Date());
-		bankAccount.setBalance(initialBalane);
-		
-		bankAccount.setCustomer(null);
-		return null;
-	}
+    @Override
+    public List<Customer> listCustomer() {
+        log.info("Fetching all customers");
+        return customerRepo.findAll();
+    }
 
-	@Override
-	public List<Customer> listCustomer() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public BankAccount getAccount(String accountId) throws BankAccountNotFoundException {
+        log.info("Fetching bank account with ID {}", accountId);
+        return bankRepo.findById(accountId).orElseThrow(() -> new BankAccountNotFoundException("Bank account not found"));
+    }
 
-	@Override
-	public BankAccount getAccount(String accountId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public void debit(String accountId, double amount, String description) throws BankAccountNotFoundException,BalanceNotSufficentException {
+        log.info("Debiting account with ID {}", accountId);
+        BankAccount account = getAccount(accountId);
+        if (account.getBalance() < amount) {
+            throw new BalanceNotSufficentException("Balance not sufficient");
+        }
+        AccountOperation accountOp = new AccountOperation();
+        accountOp.setType(OperationType.CREDIT);
+        accountOp.setAmount(amount);
+        accountOp.setDescription(description);
+        accountOp.setOperationDate(new Date());
+        
+        account.setBalance(account.getBalance() - amount);
+        accountOpRepo.save(accountOp);
+        
+        bankRepo.save(account);
+    }
 
-	@Override
-	public void debit(String accountId, double amount, String description) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void credit(String accountId, double amount, String description) throws BankAccountNotFoundException {
+        log.info("Crediting account with ID {}", accountId);
+        BankAccount account = getAccount(accountId);
+        account.setBalance(account.getBalance() + amount);
+        bankRepo.save(account);
+    }
 
-	@Override
-	public void credit(String accountId, double amount, String description) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void transfer(String accountIdSource, String accountIdDestination, double amountOp) {
+        log.info("Transferring {} from {} to {}", amountOp, accountIdSource, accountIdDestination);
+        debit(accountIdSource, amountOp, "Transfer to " + accountIdDestination);
+        credit(accountIdDestination, amountOp, "Transfer from " + accountIdSource);
+    }
+//Creation des comptes bancaires
+    @Override
+    public CurrentAccount saveCurrentBankAccount(double initialBalance, double overDraft, Long customerId)
+            throws CustomerNotFoundException {
+        Customer customer = customerRepo.findById(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+        CurrentAccount currentBankAccount = new CurrentAccount();
+        currentBankAccount.setId(UUID.randomUUID().toString());
+        currentBankAccount.setCreated_date(new Date());
+        currentBankAccount.setBalance(initialBalance);
+        currentBankAccount.setCustomer(customer);
+        currentBankAccount.setOverDraft(overDraft);
+        return bankRepo.save(currentBankAccount);
+    }
 
-	@Override
-	public void transfer(String accountIdSource, String accountIdDestination, double amountOp) {
-		// TODO Auto-generated method stub
-		
-	}
-
+    @Override
+    public SavingAccount saveSavingBankAccount(double initialBalance, double interestRate, Long customerId)
+            throws CustomerNotFoundException {
+        Customer customer = customerRepo.findById(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+        SavingAccount savingAccount = new SavingAccount();
+        savingAccount.setId(UUID.randomUUID().toString());
+        savingAccount.setCreated_date(new Date());
+        savingAccount.setBalance(initialBalance);
+        savingAccount.setCustomer(customer);
+        savingAccount.setInteresRate(interestRate);
+        return bankRepo.save(savingAccount);
+    }
 }
