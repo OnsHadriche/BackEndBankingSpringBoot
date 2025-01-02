@@ -1,5 +1,6 @@
 package tn.com.services;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -10,6 +11,7 @@ import enums.OperationType;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import tn.com.dto.CustomerDTO;
 import tn.com.entities.AccountOperation;
 import tn.com.entities.BankAccount;
 import tn.com.entities.CurrentAccount;
@@ -18,6 +20,7 @@ import tn.com.entities.SavingAccount;
 import tn.com.exception.BalanceNotSufficentException;
 import tn.com.exception.BankAccountNotFoundException;
 import tn.com.exception.CustomerNotFoundException;
+import tn.com.mappers.BankAccountMapperImpl;
 import tn.com.repositories.AccountOperationRepository;
 import tn.com.repositories.BankAccountRepository;
 import tn.com.repositories.CustomerRepository;
@@ -31,7 +34,7 @@ public class BankAccountServiceImp implements BankAccountService {
 	private final CustomerRepository customerRepo;
 	private final BankAccountRepository bankRepo;
 	private final AccountOperationRepository accountOpRepo;
-
+	private final BankAccountMapperImpl dtoMapper;
 	@Override
 	public Customer saveCustomer(Customer customer) {
 		log.info("Saving new customer");
@@ -39,9 +42,17 @@ public class BankAccountServiceImp implements BankAccountService {
 	}
 
 	@Override
-	public List<Customer> listCustomer() {
+	public List<CustomerDTO> listCustomer() {
 		log.info("Fetching all customers");
-		return customerRepo.findAll();
+		List<Customer> customers = customerRepo.findAll();
+		List<CustomerDTO> customerDTOs = new ArrayList<>();
+		for (Customer customer : customers) {
+			CustomerDTO customerDTO = dtoMapper.fromCustomer(customer);
+			customerDTOs.add(customerDTO);
+		}
+
+		
+		return customerDTOs ;
 	}
 
 	@Override
@@ -131,5 +142,15 @@ public class BankAccountServiceImp implements BankAccountService {
 	public List<BankAccount> listBankAccount() {
 		log.info("Fetching all accounts");
 		return bankRepo.findAll();
+	}
+
+	public CustomerDTO getCustomer(Long customerId) throws CustomerNotFoundException {
+		Customer customer;
+		try {
+			customer = customerRepo.findById(customerId).orElseThrow(()-> new CustomerNotFoundException("Customer not found"));
+		} catch (CustomerNotFoundException e) {
+			e.printStackTrace();
+		}
+		return dtoMapper.fromCustomer(customer);
 	}
 }

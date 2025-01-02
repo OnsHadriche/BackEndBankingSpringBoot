@@ -1,4 +1,4 @@
-package tn.com.dao;
+package tn.com.dto;
 
 import lombok.Data;
 
