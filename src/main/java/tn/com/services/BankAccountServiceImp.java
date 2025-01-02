@@ -57,28 +57,37 @@ public class BankAccountServiceImp implements BankAccountService {
         if (account.getBalance() < amount) {
             throw new BalanceNotSufficentException("Balance not sufficient");
         }
+        //Ajoute operation
         AccountOperation accountOp = new AccountOperation();
-        accountOp.setType(OperationType.CREDIT);
+        accountOp.setType(OperationType.DEBIT);
         accountOp.setAmount(amount);
         accountOp.setDescription(description);
         accountOp.setOperationDate(new Date());
-        
-        account.setBalance(account.getBalance() - amount);
         accountOpRepo.save(accountOp);
-        
+        //update account
+        account.setBalance(account.getBalance() - amount);
         bankRepo.save(account);
     }
 
     @Override
     public void credit(String accountId, double amount, String description) throws BankAccountNotFoundException {
-        log.info("Crediting account with ID {}", accountId);
-        BankAccount account = getAccount(accountId);
-        account.setBalance(account.getBalance() + amount);
-        bankRepo.save(account);
+    	 log.info("Crediting account with ID {}", accountId);
+         BankAccount account = getAccount(accountId);
+       
+         //Ajoute operation
+         AccountOperation accountOp = new AccountOperation();
+         accountOp.setType(OperationType.CREDIT);
+         accountOp.setAmount(amount);
+         accountOp.setDescription(description);
+         accountOp.setOperationDate(new Date());
+         accountOpRepo.save(accountOp);
+         //update account
+         account.setBalance(account.getBalance() + amount);
+         bankRepo.save(account);
     }
 
     @Override
-    public void transfer(String accountIdSource, String accountIdDestination, double amountOp) {
+    public void transfer(String accountIdSource, String accountIdDestination, double amountOp) throws BankAccountNotFoundException, BalanceNotSufficentException {
         log.info("Transferring {} from {} to {}", amountOp, accountIdSource, accountIdDestination);
         debit(accountIdSource, amountOp, "Transfer to " + accountIdDestination);
         credit(accountIdDestination, amountOp, "Transfer from " + accountIdSource);
