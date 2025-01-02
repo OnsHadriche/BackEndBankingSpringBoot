@@ -20,9 +20,10 @@ import tn.com.entities.SavingAccount;
 import tn.com.repositories.AccountOperationRepository;
 import tn.com.repositories.BankAccountRepository;
 import tn.com.repositories.CustomerRepository;
+import tn.com.services.BankService;
 
-@SpringBootApplication
-@EnableJpaRepositories(basePackages = "tn.com.repositories")
+@SpringBootApplication(scanBasePackages = {"tn.com.services", "tn.com.repositories", "tn.com.entities"})
+@EnableJpaRepositories(basePackages = {"tn.com.repositories","tn.com.services"})
 @EntityScan("tn.com.entities")
 public class EbankingBackendApplication {
 
@@ -30,24 +31,9 @@ public class EbankingBackendApplication {
 		SpringApplication.run(EbankingBackendApplication.class, args);
 	}
 	@Bean
-	CommandLineRunner start(BankAccountRepository bankAccountRepo,
-			AccountOperationRepository accountOpRepo) {
+	CommandLineRunner start(BankService bankService) {
 		return args -> {
-			BankAccount bankAccount = bankAccountRepo.findById((long) 3).orElse(null);
-			System.out.println("**************************");
-			System.out.println(bankAccount.getId());
-			System.out.println(bankAccount.getBalance());
-			System.out.println(bankAccount.getCustomer().getName());
-			System.out.println(bankAccount.getCreated_date());
-			if(bankAccount instanceof CurrentAccount) {
-				System.out.println(((CurrentAccount) bankAccount).getOverDraft());
-			}else {
-				System.out.println(((SavingAccount) bankAccount).getInteresRate());
-			}
-			bankAccount.getBanckAccountoperations().forEach(op->{
-				System.out.println("operation type: "+op.getType());
-				
-			});
+			bankService.consulter();
 			
 			
 		};
