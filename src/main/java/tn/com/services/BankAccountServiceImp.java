@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -35,6 +36,7 @@ public class BankAccountServiceImp implements BankAccountService {
 	private final BankAccountRepository bankRepo;
 	private final AccountOperationRepository accountOpRepo;
 	private final BankAccountMapperImpl dtoMapper;
+
 	@Override
 	public Customer saveCustomer(Customer customer) {
 		log.info("Saving new customer");
@@ -45,14 +47,15 @@ public class BankAccountServiceImp implements BankAccountService {
 	public List<CustomerDTO> listCustomer() {
 		log.info("Fetching all customers");
 		List<Customer> customers = customerRepo.findAll();
-		List<CustomerDTO> customerDTOs = new ArrayList<>();
-		for (Customer customer : customers) {
-			CustomerDTO customerDTO = dtoMapper.fromCustomer(customer);
-			customerDTOs.add(customerDTO);
-		}
-
-		
-		return customerDTOs ;
+		/*
+		 * List<CustomerDTO> customerDTOs = new ArrayList<>(); for (Customer customer :
+		 * customers) { CustomerDTO customerDTO = dtoMapper.fromCustomer(customer);
+		 * customerDTOs.add(customerDTO); }
+		 * 
+		 */
+		List<CustomerDTO> customerDTOs = customers.stream().map(cust -> dtoMapper.fromCustomer(cust))
+				.collect(Collectors.toList());
+		return customerDTOs;
 	}
 
 	@Override
@@ -146,11 +149,11 @@ public class BankAccountServiceImp implements BankAccountService {
 
 	public CustomerDTO getCustomer(Long customerId) throws CustomerNotFoundException {
 		Customer customer;
-		try {
-			customer = customerRepo.findById(customerId).orElseThrow(()-> new CustomerNotFoundException("Customer not found"));
-		} catch (CustomerNotFoundException e) {
-			e.printStackTrace();
-		}
-		return dtoMapper.fromCustomer(customer);
+
+		customer = customerRepo.findById(customerId)
+				.orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+		CustomerDTO customerDTO = dtoMapper.fromCustomer(customer);
+
+		return customerDTO;
 	}
 }
