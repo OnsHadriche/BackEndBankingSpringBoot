@@ -18,6 +18,7 @@ public interface BankAccountService {
 	SavingAccount saveSavingBankAccount(double initialBalane,double interestRate, Long customerId) throws CustomerNotFoundException;
 
 	List<Customer> listCustomer();
+	List<BankAccount> listBankAccount();
 
 	BankAccount getAccount(String accountId) throws BankAccountNotFoundException;
 
@@ -26,5 +27,6 @@ public interface BankAccountService {
 	void credit(String accountId, double amount, String description) throws BankAccountNotFoundException;
 
 	void transfer(String accountIdSource, String accountIdDestination, double amountOp) throws BankAccountNotFoundException, BalanceNotSufficentException;
+	
 
 }

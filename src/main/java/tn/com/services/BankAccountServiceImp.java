@@ -28,96 +28,106 @@ import tn.com.repositories.CustomerRepository;
 @Slf4j
 public class BankAccountServiceImp implements BankAccountService {
 
-    private final CustomerRepository customerRepo;
-    private final BankAccountRepository bankRepo;
-    private final AccountOperationRepository accountOpRepo;
+	private final CustomerRepository customerRepo;
+	private final BankAccountRepository bankRepo;
+	private final AccountOperationRepository accountOpRepo;
 
-    @Override
-    public Customer saveCustomer(Customer customer) {
-        log.info("Saving new customer");
-        return customerRepo.save(customer);
-    }
+	@Override
+	public Customer saveCustomer(Customer customer) {
+		log.info("Saving new customer");
+		return customerRepo.save(customer);
+	}
 
-    @Override
-    public List<Customer> listCustomer() {
-        log.info("Fetching all customers");
-        return customerRepo.findAll();
-    }
+	@Override
+	public List<Customer> listCustomer() {
+		log.info("Fetching all customers");
+		return customerRepo.findAll();
+	}
 
-    @Override
-    public BankAccount getAccount(String accountId) throws BankAccountNotFoundException {
-        log.info("Fetching bank account with ID {}", accountId);
-        return bankRepo.findById(accountId).orElseThrow(() -> new BankAccountNotFoundException("Bank account not found"));
-    }
+	@Override
+	public BankAccount getAccount(String accountId) throws BankAccountNotFoundException {
+		log.info("Fetching bank account with ID {}", accountId);
+		return bankRepo.findById(accountId)
+				.orElseThrow(() -> new BankAccountNotFoundException("Bank account not found"));
+	}
 
-    @Override
-    public void debit(String accountId, double amount, String description) throws BankAccountNotFoundException,BalanceNotSufficentException {
-        log.info("Debiting account with ID {}", accountId);
-        BankAccount account = getAccount(accountId);
-        if (account.getBalance() < amount) {
-            throw new BalanceNotSufficentException("Balance not sufficient");
-        }
-        //Ajoute operation
-        AccountOperation accountOp = new AccountOperation();
-        accountOp.setType(OperationType.DEBIT);
-        accountOp.setAmount(amount);
-        accountOp.setDescription(description);
-        accountOp.setOperationDate(new Date());
-        accountOpRepo.save(accountOp);
-        //update account
-        account.setBalance(account.getBalance() - amount);
-        bankRepo.save(account);
-    }
+	@Override
+	public void debit(String accountId, double amount, String description)
+			throws BankAccountNotFoundException, BalanceNotSufficentException {
+		log.info("Debiting account with ID {}", accountId);
+		BankAccount account = getAccount(accountId);
+		if (account.getBalance() < amount) {
+			throw new BalanceNotSufficentException("Balance not sufficient");
+		}
+		// Ajoute operation
+		AccountOperation accountOp = new AccountOperation();
+		accountOp.setType(OperationType.DEBIT);
+		accountOp.setAmount(amount);
+		accountOp.setDescription(description);
+		accountOp.setOperationDate(new Date());
+		accountOpRepo.save(accountOp);
+		// update account
+		account.setBalance(account.getBalance() - amount);
+		bankRepo.save(account);
+	}
 
-    @Override
-    public void credit(String accountId, double amount, String description) throws BankAccountNotFoundException {
-    	 log.info("Crediting account with ID {}", accountId);
-         BankAccount account = getAccount(accountId);
-       
-         //Ajoute operation
-         AccountOperation accountOp = new AccountOperation();
-         accountOp.setType(OperationType.CREDIT);
-         accountOp.setAmount(amount);
-         accountOp.setDescription(description);
-         accountOp.setOperationDate(new Date());
-         accountOpRepo.save(accountOp);
-         //update account
-         account.setBalance(account.getBalance() + amount);
-         bankRepo.save(account);
-    }
+	@Override
+	public void credit(String accountId, double amount, String description) throws BankAccountNotFoundException {
+		log.info("Crediting account with ID {}", accountId);
+		BankAccount account = getAccount(accountId);
 
-    @Override
-    public void transfer(String accountIdSource, String accountIdDestination, double amountOp) throws BankAccountNotFoundException, BalanceNotSufficentException {
-        log.info("Transferring {} from {} to {}", amountOp, accountIdSource, accountIdDestination);
-        debit(accountIdSource, amountOp, "Transfer to " + accountIdDestination);
-        credit(accountIdDestination, amountOp, "Transfer from " + accountIdSource);
-    }
+		// Ajoute operation
+		AccountOperation accountOp = new AccountOperation();
+		accountOp.setType(OperationType.CREDIT);
+		accountOp.setAmount(amount);
+		accountOp.setDescription(description);
+		accountOp.setOperationDate(new Date());
+		accountOpRepo.save(accountOp);
+		// update account
+		account.setBalance(account.getBalance() + amount);
+		bankRepo.save(account);
+	}
+
+	@Override
+	public void transfer(String accountIdSource, String accountIdDestination, double amountOp)
+			throws BankAccountNotFoundException, BalanceNotSufficentException {
+		log.info("Transferring {} from {} to {}", amountOp, accountIdSource, accountIdDestination);
+		debit(accountIdSource, amountOp, "Transfer to " + accountIdDestination);
+		credit(accountIdDestination, amountOp, "Transfer from " + accountIdSource);
+	}
+
 //Creation des comptes bancaires
-    @Override
-    public CurrentAccount saveCurrentBankAccount(double initialBalance, double overDraft, Long customerId)
-            throws CustomerNotFoundException {
-        Customer customer = customerRepo.findById(customerId)
-                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
-        CurrentAccount currentBankAccount = new CurrentAccount();
-        currentBankAccount.setId(UUID.randomUUID().toString());
-        currentBankAccount.setCreated_date(new Date());
-        currentBankAccount.setBalance(initialBalance);
-        currentBankAccount.setCustomer(customer);
-        currentBankAccount.setOverDraft(overDraft);
-        return bankRepo.save(currentBankAccount);
-    }
+	@Override
+	public CurrentAccount saveCurrentBankAccount(double initialBalance, double overDraft, Long customerId)
+			throws CustomerNotFoundException {
+		Customer customer = customerRepo.findById(customerId)
+				.orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+		CurrentAccount currentBankAccount = new CurrentAccount();
+		currentBankAccount.setId(UUID.randomUUID().toString());
+		currentBankAccount.setCreated_date(new Date());
+		currentBankAccount.setBalance(initialBalance);
+		currentBankAccount.setCustomer(customer);
+		currentBankAccount.setOverDraft(overDraft);
+		return bankRepo.save(currentBankAccount);
+	}
 
-    @Override
-    public SavingAccount saveSavingBankAccount(double initialBalance, double interestRate, Long customerId)
-            throws CustomerNotFoundException {
-        Customer customer = customerRepo.findById(customerId)
-                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
-        SavingAccount savingAccount = new SavingAccount();
-        savingAccount.setId(UUID.randomUUID().toString());
-        savingAccount.setCreated_date(new Date());
-        savingAccount.setBalance(initialBalance);
-        savingAccount.setCustomer(customer);
-        savingAccount.setInteresRate(interestRate);
-        return bankRepo.save(savingAccount);
-    }
+	@Override
+	public SavingAccount saveSavingBankAccount(double initialBalance, double interestRate, Long customerId)
+			throws CustomerNotFoundException {
+		Customer customer = customerRepo.findById(customerId)
+				.orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+		SavingAccount savingAccount = new SavingAccount();
+		savingAccount.setId(UUID.randomUUID().toString());
+		savingAccount.setCreated_date(new Date());
+		savingAccount.setBalance(initialBalance);
+		savingAccount.setCustomer(customer);
+		savingAccount.setInteresRate(interestRate);
+		return bankRepo.save(savingAccount);
+	}
+
+	@Override
+	public List<BankAccount> listBankAccount() {
+		log.info("Fetching all accounts");
+		return bankRepo.findAll();
+	}
 }
