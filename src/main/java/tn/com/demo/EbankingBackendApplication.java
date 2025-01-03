@@ -10,9 +10,10 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import tn.com.dto.BankAccountDTO;
+import tn.com.dto.CurrentBankAccountDTO;
 import tn.com.dto.CustomerDTO;
-import tn.com.entities.BankAccount;
-import tn.com.entities.Customer;
+import tn.com.dto.SavingBankAccountDTO;
 import tn.com.exception.BalanceNotSufficentException;
 import tn.com.exception.BankAccountNotFoundException;
 import tn.com.exception.CustomerNotFoundException;
@@ -41,13 +42,18 @@ public class EbankingBackendApplication {
 				try {
 					bankAccountService.saveCurrentBankAccount(Math.random() * 100000000, 9000, customer.getId());
 					bankAccountService.saveSavingBankAccount(Math.random() * 1000, 2.2, customer.getId());
-					List<BankAccount> bankAccounts = bankAccountService.listBankAccount();
-					for (BankAccount bankAccount : bankAccounts) {
-						for (int i = 0; i < 10; i++) {
+					List<BankAccountDTO> bankAccounts = bankAccountService.listBankAccount();
+					for (BankAccountDTO bankAccount : bankAccounts) {
+						for (int i = 0; i < 5; i++) {
 
-							bankAccountService.credit(bankAccount.getId(), 10000+Math.random() * 100000, "Credit");
-							bankAccountService.debit(bankAccount.getId(),10+ Math.random() * 10, "Debit");
-
+							  String accountId;
+			                    if(bankAccount instanceof SavingBankAccountDTO){
+			                        accountId=((SavingBankAccountDTO) bankAccount).getId();
+			                    } else{
+			                        accountId=((CurrentBankAccountDTO) bankAccount).getId();
+			                    }
+			                    bankAccountService.credit(accountId,10000+Math.random()*120000,"Credit");
+			                    bankAccountService.debit(accountId,1000+Math.random()*9000,"Debit");
 						}
 					}
 
