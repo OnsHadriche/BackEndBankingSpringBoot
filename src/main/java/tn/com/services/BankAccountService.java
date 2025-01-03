@@ -2,6 +2,8 @@ package tn.com.services;
 
 import java.util.List;
 
+import tn.com.dto.AccountHistoryDTO;
+import tn.com.dto.AccountOperationDTO;
 import tn.com.dto.BankAccountDTO;
 import tn.com.dto.CustomerDTO;
 import tn.com.entities.BankAccount;
@@ -35,6 +37,10 @@ public interface BankAccountService {
     CustomerDTO updateCustomer(CustomerDTO customerDTO);
 
     void deleteCustomer(Long customerId);
+
+	List<AccountOperationDTO> accountHistory(String accountId);
+
+	AccountHistoryDTO getAccountHistory(String accountId, int page, int size) throws BankAccountNotFoundException;
 	
 
 }

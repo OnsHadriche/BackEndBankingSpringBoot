@@ -5,12 +5,16 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import enums.OperationType;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import tn.com.dto.AccountHistoryDTO;
+import tn.com.dto.AccountOperationDTO;
 import tn.com.dto.BankAccountDTO;
 import tn.com.dto.CustomerDTO;
 import tn.com.entities.AccountOperation;
@@ -36,7 +40,7 @@ public class BankAccountServiceImp implements BankAccountService {
 	private final BankAccountRepository bankRepo;
 	private final AccountOperationRepository accountOpRepo;
 	private final BankAccountMapperImpl dtoMapper;
-
+	
 	@Override
 	public CustomerDTO saveCustomer(CustomerDTO customerDTO) {
 		log.info("Saving new customer");
@@ -110,7 +114,27 @@ public class BankAccountServiceImp implements BankAccountService {
         debit(accountIdSource,amount,"Transfer to "+ accountIdDestination);
         credit(accountIdDestination,amount,"Transfer from "+accountIdSource);
     }
-
+	 @Override
+	    public List<AccountOperationDTO> accountHistory(String accountId){
+	        List<AccountOperation> accountOperations = accountOpRepo.findByBankAccountId(accountId);
+	        return accountOperations.stream().map(op->dtoMapper.fromAccountOperation(op)).collect(Collectors.toList());
+	    }
+	 
+	   @Override
+	    public AccountHistoryDTO getAccountHistory(String accountId, int page, int size) throws BankAccountNotFoundException {
+	        BankAccount bankAccount=bankRepo.findById(accountId).orElse(null);
+	        if(bankAccount==null) throw new BankAccountNotFoundException("Account not Found");
+	        Page <AccountOperation> accountOperations = accountOpRepo.findByBankAccountIdOrderByOperationDateDesc(accountId, PageRequest.of(page, size));
+	        AccountHistoryDTO accountHistoryDTO=new AccountHistoryDTO();
+	        List<AccountOperationDTO> accountOperationDTOS = accountOperations.getContent().stream().map(op -> dtoMapper.fromAccountOperation(op)).collect(Collectors.toList());
+	        accountHistoryDTO.setAccountOperationDTOS(accountOperationDTOS);
+	        accountHistoryDTO.setAccountId(bankAccount.getId());
+	        accountHistoryDTO.setBalance(bankAccount.getBalance());
+	        accountHistoryDTO.setCurrentPage(page);
+	        accountHistoryDTO.setPageSize(size);
+	        accountHistoryDTO.setTotalPages(accountOperations.getTotalPages());
+	        return accountHistoryDTO;
+	    }
 //Creation des comptes bancaires
 	@Override
 	public CurrentAccount saveCurrentBankAccount(double initialBalance, double overDraft, Long customerId)
