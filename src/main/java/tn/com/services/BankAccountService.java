@@ -2,10 +2,10 @@ package tn.com.services;
 
 import java.util.List;
 
+import tn.com.dto.BankAccountDTO;
 import tn.com.dto.CustomerDTO;
 import tn.com.entities.BankAccount;
 import tn.com.entities.CurrentAccount;
-import tn.com.entities.Customer;
 import tn.com.entities.SavingAccount;
 import tn.com.exception.BalanceNotSufficentException;
 import tn.com.exception.BankAccountNotFoundException;
@@ -19,9 +19,9 @@ public interface BankAccountService {
 	SavingAccount saveSavingBankAccount(double initialBalane,double interestRate, Long customerId) throws CustomerNotFoundException;
 
 	List<CustomerDTO> listCustomer();
-	List<BankAccount> listBankAccount();
+	List<BankAccountDTO> listBankAccount();
 
-	BankAccount getAccount(String accountId) throws BankAccountNotFoundException;
+	BankAccountDTO getAccount(String accountId) throws BankAccountNotFoundException;
 
 	void debit(String accountId, double amount, String description) throws BankAccountNotFoundException, BalanceNotSufficentException;
 

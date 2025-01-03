@@ -3,8 +3,14 @@ package tn.com.mappers;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import tn.com.dto.AccountOperationDTO;
+import tn.com.dto.CurrentBankAccountDTO;
 import tn.com.dto.CustomerDTO;
+import tn.com.dto.SavingBankAccountDTO;
+import tn.com.entities.AccountOperation;
+import tn.com.entities.CurrentAccount;
 import tn.com.entities.Customer;
+import tn.com.entities.SavingAccount;
 @Service
 public class BankAccountMapperImpl {
     public CustomerDTO fromCustomer(Customer customer){
@@ -17,7 +23,6 @@ public class BankAccountMapperImpl {
         BeanUtils.copyProperties(customerDTO,customer);
         return  customer;
     }
-    /*
 
     public SavingBankAccountDTO fromSavingBankAccount(SavingAccount savingAccount){
         SavingBankAccountDTO savingBankAccountDTO=new SavingBankAccountDTO();
@@ -54,5 +59,5 @@ public class BankAccountMapperImpl {
         BeanUtils.copyProperties(accountOperation,accountOperationDTO);
         return accountOperationDTO;
     }
-*/
+
 }
