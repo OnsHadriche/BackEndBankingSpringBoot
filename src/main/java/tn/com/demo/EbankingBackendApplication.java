@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import tn.com.dto.CustomerDTO;
 import tn.com.entities.BankAccount;
 import tn.com.entities.Customer;
 import tn.com.exception.BalanceNotSufficentException;
@@ -31,7 +32,7 @@ public class EbankingBackendApplication {
 		return args -> {
 
 			Stream.of("Ons", "Khalil", "Emna").forEach(name -> {
-				Customer customer = new Customer();
+				CustomerDTO customer = new CustomerDTO();
 				customer.setName(name);
 				customer.setEmail(name + "@gmail.com");
 				bankAccountService.saveCustomer(customer); // Save customer to the repository

@@ -13,7 +13,7 @@ import tn.com.exception.CustomerNotFoundException;
 
 public interface BankAccountService {
 
-	Customer saveCustomer(Customer customer);
+	CustomerDTO saveCustomer(CustomerDTO customer);
 
 	CurrentAccount saveCurrentBankAccount(double initialBalane,double overDraft, Long customerId) throws CustomerNotFoundException;
 	SavingAccount saveSavingBankAccount(double initialBalane,double interestRate, Long customerId) throws CustomerNotFoundException;
@@ -30,6 +30,11 @@ public interface BankAccountService {
 	void transfer(String accountIdSource, String accountIdDestination, double amountOp) throws BankAccountNotFoundException, BalanceNotSufficentException;
 
 	CustomerDTO getCustomer(Long customerId) throws CustomerNotFoundException;
+
+
+    CustomerDTO updateCustomer(CustomerDTO customerDTO);
+
+    void deleteCustomer(Long customerId);
 	
 
 }

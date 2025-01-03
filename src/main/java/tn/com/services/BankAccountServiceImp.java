@@ -37,9 +37,11 @@ public class BankAccountServiceImp implements BankAccountService {
 	private final BankAccountMapperImpl dtoMapper;
 
 	@Override
-	public Customer saveCustomer(Customer customer) {
+	public CustomerDTO saveCustomer(CustomerDTO customerDTO) {
 		log.info("Saving new customer");
-		return customerRepo.save(customer);
+		Customer customer = dtoMapper.fromCustomerDTO(customerDTO);
+		Customer savedCustomer = customerRepo.save(customer);
+		return dtoMapper.fromCustomer(savedCustomer);
 	}
 
 	@Override
@@ -145,7 +147,7 @@ public class BankAccountServiceImp implements BankAccountService {
 		log.info("Fetching all accounts");
 		return bankRepo.findAll();
 	}
-
+	@Override
 	public CustomerDTO getCustomer(Long customerId) throws CustomerNotFoundException {
 		Customer customer;
 
@@ -155,5 +157,17 @@ public class BankAccountServiceImp implements BankAccountService {
 
 		return customerDTO;
 	}
+	
+	@Override
+	  public CustomerDTO updateCustomer(CustomerDTO customerDTO) {
+        log.info("Saving new Customer");
+        Customer customer=dtoMapper.fromCustomerDTO(customerDTO);
+        Customer savedCustomer = customerRepo.save(customer);
+        return dtoMapper.fromCustomer(savedCustomer);
+    }
+	@Override
+	  public void deleteCustomer(Long customerId){
+        customerRepo.deleteById(customerId);
+    }
 	
 }
