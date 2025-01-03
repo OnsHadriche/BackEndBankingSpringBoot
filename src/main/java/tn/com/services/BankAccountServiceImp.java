@@ -1,6 +1,5 @@
 package tn.com.services;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -156,4 +155,5 @@ public class BankAccountServiceImp implements BankAccountService {
 
 		return customerDTO;
 	}
+	
 }

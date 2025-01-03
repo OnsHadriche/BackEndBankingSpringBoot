@@ -1,4 +1,4 @@
-package com.example.demo;
+package tn.com.demo;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -17,7 +17,7 @@ import tn.com.exception.BankAccountNotFoundException;
 import tn.com.exception.CustomerNotFoundException;
 import tn.com.services.BankAccountService;
 
-@SpringBootApplication(scanBasePackages = { "tn.com.services", "tn.com.repositories", "tn.com.entities","tn.com.controllers" })
+@SpringBootApplication(scanBasePackages = { "tn.com.services", "tn.com.repositories", "tn.com.entities","tn.com.controllers","tn.com.mappers" })
 @EnableJpaRepositories(basePackages = { "tn.com.repositories", "tn.com.services" })
 @EntityScan("tn.com.entities")
 public class EbankingBackendApplication {
