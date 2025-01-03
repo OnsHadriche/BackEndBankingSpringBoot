@@ -45,7 +45,7 @@ public class BankAccountRestController {
 		return bankAccountService.getAccountHistory(accountId, page, size);
 	}
 /*
-	@PostMapping("/accounts/debit")
+s	@PostMapping("/accounts/debit")
 	public DebitDTO debit(@RequestBody DebitDTO debitDTO)
 			throws BankAccountNotFoundException, BalanceNotSufficientException {
 		this.bankAccountService.debit(debitDTO.getAccountId(), debitDTO.getAmount(), debitDTO.getDescription());
